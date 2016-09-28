@@ -18,10 +18,12 @@ var youtubeHero = new YoutubeHero({key: key})
 youtubeHero.fetchUploadsForUser(username, {
   onResult: function(err, videoId) {
     console.log(videoId);
+  },
+  onDone: function(err) {
+    console.log("Complete");
+  },
+  onError: function(err) {
+    console.log(err);
   }
-}).then(function(){
-  // Executed after all videos are fetched.
-}).catch(function(){
-  // Executed if an error occurs.
 })
 ```

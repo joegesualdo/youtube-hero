@@ -1,5 +1,5 @@
 var request = require('request');
-var Promise = require('bluebird');
+// var Promise = require('bluebird');
 
 function YoutubeHero(opts) {
   var opts = opts || {};
@@ -13,13 +13,17 @@ YoutubeHero.prototype.fetchUploadsForUser = function(username, opts) {
   var that = this;
   var opts = opts || {};
   var onResult = opts.onResult || function(){};
+  var onDone = opts.onDone || function(){};
+  var onError = opts.onError || function(){};
 
   return new Promise(function(resolve, reject){
     that.fetchUploadsPlaylistId(username)
     .then(function(playlistId){
       that.fetchVideosForPlaylist({
         playlist: playlistId,
-        onResult: onResult
+        onResult: onResult,
+        onDone: onDone,
+        onError: onError
       }).then(function(){
         resolve()
       }).catch(function(error){
@@ -42,9 +46,11 @@ YoutubeHero.prototype.fetchVideosForPlaylist = function(opts){
   var that = this;
   var playlistId = opts.playlist;
   var onResult = opts.onResult;
+  var onDone = opts.onDone;
+  var onError = opts.onError;
   var nextPageToken = opts.nextPageToken;
 
-  return new Promise(function(resolve, reject){
+  return new Promise((resolve, reject) => {
     request(that.getPlaylistUrl(playlistId, nextPageToken), function (error, response, body) {
       if (!error && response.statusCode == 200) {
         var jsonResponse = JSON.parse(body)
@@ -63,13 +69,21 @@ YoutubeHero.prototype.fetchVideosForPlaylist = function(opts){
             onResult: function(err, videoId){
               onResult(null, videoId)
             },
+            onDone: function(err){
+              onDone(null)
+            },
+            onError: function(err){
+              onError(err)
+            },
             nextPageToken: nextPageToken
           })
         } else {
-          resolve()
+          // resolve()
+          onDone(null)
         }
       } else {
-        reject()
+        // reject()
+        onError(error || new Error("There was an error"))
       }
     })
   })

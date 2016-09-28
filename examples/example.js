@@ -7,10 +7,15 @@ youtubeHero = new YoutubeHero({key: key})
 
 youtubeHero.fetchUploadsForUser(username, {
   onResult: function(err, videoId) {
-    console.log(videoId);
+    // console.log(videoId);
+  },
+  onDone: function(err) {
+    console.log("woooo it's done");
   }
-}).then(function(){
+})
+.then(() => {
   console.log("Complete")
-}).catch(function(error){
+})
+.catch((error) => {
   console.log(error)
 })
